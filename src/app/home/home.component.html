@@ -1,24 +1,20 @@
 <div class="courses-panel">
+  <h3>All Courses:</h3>
+  <!-- <h3>Counter: {{ counter }}</h3> -->
+  <h3>Counter Signal: {{ counterSignal() }}</h3>
+  <h3>Counter SignalObject: {{ counterSignalObject().value }}</h3>
+  <h3>Counter Array: {{ values().join(", ") }}</h3>
+  <button class="btn">Add Course</button>
 
-  <h3>All Courses</h3>
-
-  <button class="btn">
-    Add Course
+  <!-- <button class="btn" (click)="increment()">Increment</button> -->
+  <button class="btn" (click)="incrementSignal()">Increment Signal</button>
+  <button class="btn" (click)="incrementSignalObject()">
+    Increment SignalObject
   </button>
 
   <mat-tab-group>
+    <mat-tab label="Beginners"> </mat-tab>
 
-    <mat-tab label="Beginners">
-
-
-
-    </mat-tab>
-
-    <mat-tab label="Advanced">
-
-
-    </mat-tab>
-
+    <mat-tab label="Advanced"> </mat-tab>
   </mat-tab-group>
-
 </div>
