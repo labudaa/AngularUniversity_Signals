@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   Component,
   computed,
   effect,
@@ -31,6 +32,26 @@ type CounterObject = {
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
+  //use of effect - in constructor so garbage collector would catch it.
+  //Other way is to use injector. Example with afterNextRender
+  injector = inject(Injector);
+  constructor() {
+    effect(() => {
+      console.log(`1 Counter Signal value: ${this.counterSignal()}`);
+    });
+
+    afterNextRender(() => {
+      effect(
+        () => {
+          console.log(`Counter Signal valuex10: ${this.tenXCounter()}`);
+        },
+        {
+          injector: this.injector,
+        }
+      );
+    });
+  }
+
   // counter = 0;
   // increment() {
   //   this.counter++;
@@ -51,5 +72,18 @@ export class HomeComponent {
   }
 
   //signal with array
-  values = signal<number[]>([1, 2, 3]);
+  values = signal<number[]>([0]);
+  append() {
+    this.values.update((values) => [...values, values[values.length - 1] + 1]);
+  }
+
+  //computed signal
+  tenXCounter = computed(() => {
+    const val = this.counterSignal();
+    return val * 10;
+  });
+  hundredXCounter = computed(() => {
+    const val = this.tenXCounter();
+    return val * 10;
+  });
 }
