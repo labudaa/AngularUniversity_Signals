@@ -1,19 +1,30 @@
 <div class="courses-panel">
   <h3>All Courses:</h3>
-  <!-- <h3>Counter: {{ counter }}</h3> -->
-  <h3>Counter Signal: {{ counterSignal() }}</h3>
-  <h3>Counter Signal x10: {{ tenXCounter() }}</h3>
-  <h3>Counter Signal x100: {{ hundredXCounter() }}</h3>
-  <h3>Counter SignalObject: {{ counterSignalObject().value }}</h3>
-  <h3>Counter Array: {{ values().join(", ") }}</h3>
-  <button class="btn">Add Course</button>
+  @if(counterVisible()) {
+  <div>
+    <!-- <h3>Counter: {{ counter }}</h3> -->
+    <h3>Counter Signal: {{ counterSignal() }}</h3>
+    <h3>Counter Signal x10: {{ tenXCounter() }}</h3>
+    <h3>Counter Signal x100: {{ hundredXCounter() }}</h3>
+    <h3>Counter SignalObject: {{ counterSignalObject().value }}</h3>
+    <h3>Counter Array: {{ values().join(", ") }}</h3>
 
-  <!-- <button class="btn" (click)="increment()">Increment</button> -->
-  <button class="btn" (click)="incrementSignal()">Increment Signal</button>
-  <button class="btn" (click)="incrementSignalObject()">
-    Increment SignalObject
-  </button>
-  <button class="btn" (click)="append()">Increment Array</button>
+    <!-- <button class="btn" (click)="increment()">Increment</button> -->
+    <button class="btn" (click)="incrementSignal()">Increment Signal</button>
+    <button class="btn" (click)="incrementSignalObject()">
+      Increment SignalObject
+    </button>
+    <button class="btn" (click)="append()">Increment Array</button>
+    <button class="btn" (click)="cleanup()">CleanUp Effect</button>
+  </div>
+  }
+  <div>
+    <button class="btn" (click)="counterSectionVisible()">
+      CounterSection
+    </button>
+  </div>
+
+  <button class="btn">Add Course</button>
 
   <mat-tab-group>
     <mat-tab label="Beginners"> </mat-tab>

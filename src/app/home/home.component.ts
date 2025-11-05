@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   effect,
+  EffectRef,
   inject,
   Injector,
   signal,
@@ -35,11 +36,29 @@ export class HomeComponent {
   //use of effect - in constructor so garbage collector would catch it.
   //Other way is to use injector. Example with afterNextRender
   injector = inject(Injector);
+  effectRef: EffectRef | null = null;
+
   constructor() {
+    //normal use
     effect(() => {
       console.log(`1 Counter Signal value: ${this.counterSignal()}`);
     });
 
+    //manual cleanup for effect
+    this.effectRef = effect((onCleanup) => {
+      //use of signal can't be nested, for example it can't be inside setTimeout function
+      const counter = this.counterSignal();
+      const timeout = setTimeout(() => {
+        console.log(`TIMEOUT - EffectRef: ${counter}`);
+      }, 1000);
+
+      onCleanup(() => {
+        console.log('Callback - cleanup');
+        clearTimeout(timeout);
+      });
+    });
+
+    //use with injector
     afterNextRender(() => {
       effect(
         () => {
@@ -51,11 +70,6 @@ export class HomeComponent {
       );
     });
   }
-
-  // counter = 0;
-  // increment() {
-  //   this.counter++;
-  // }
 
   counterSignal = signal(0);
   incrementSignal() {
@@ -86,4 +100,13 @@ export class HomeComponent {
     const val = this.tenXCounter();
     return val * 10;
   });
+
+  cleanup() {
+    this.effectRef?.destroy();
+  }
+
+  counterVisible = signal(false);
+  counterSectionVisible() {
+    this.counterVisible.update((v) => !this.counterVisible());
+  }
 }
