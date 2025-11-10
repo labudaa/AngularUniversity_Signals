@@ -27,8 +27,20 @@
   <button class="btn">Add Course</button>
 
   <mat-tab-group>
-    <mat-tab label="Beginners"> </mat-tab>
+    <mat-tab label="Beginners">
+      <courses-card-list
+        (courseUpdated)="onCourseUpdated($event)"
+        (courseDeleted)="onCoursDeleted($event)"
+        [courses]="beginnerCourses()"
+      />
+    </mat-tab>
 
-    <mat-tab label="Advanced"> </mat-tab>
+    <mat-tab label="Advanced">
+      <courses-card-list
+        (courseUpdated)="onCourseUpdated($event)"
+        (courseDeleted)="onCoursDeleted($event)"
+        [courses]="advancedCourses()"
+      />
+    </mat-tab>
   </mat-tab-group>
 </div>

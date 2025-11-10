@@ -21,6 +21,7 @@ import {
   outputToObservable,
   outputFromObservable,
 } from '@angular/core/rxjs-interop';
+import { CoursesServiceWithFetch } from '../services/courses-fetch.service';
 
 type CounterObject = {
   value: number;
@@ -39,6 +40,8 @@ export class HomeComponent {
   effectRef: EffectRef | null = null;
 
   constructor() {
+    //#region EFFECTS
+    //EFFECTS DEFINED IN CONTRUCTOR
     //normal use
     effect(() => {
       console.log(`1 Counter Signal value: ${this.counterSignal()}`);
@@ -57,7 +60,6 @@ export class HomeComponent {
         clearTimeout(timeout);
       });
     });
-
     //use with injector
     afterNextRender(() => {
       effect(
@@ -69,6 +71,23 @@ export class HomeComponent {
         }
       );
     });
+    //#endregion
+
+    //#region LOAD COURSES
+    //EFFECT for computed signals
+    effect(() => {
+      console.log(`Begginer courses: `, this.beginnerCourses());
+      console.log(`Advanced courses: `, this.advancedCourses());
+    });
+
+    //it can be moved to the ngOnInit
+    this.loadCourses().then(() =>
+      console.log(
+        'Initial Load of courses. All courses loaded: ',
+        this.#courses()
+      )
+    );
+    //#endregion;
   }
 
   counterSignal = signal(0);
@@ -108,5 +127,51 @@ export class HomeComponent {
   counterVisible = signal(false);
   counterSectionVisible() {
     this.counterVisible.update((v) => !this.counterVisible());
+  }
+
+  //-----------------START-------------------------------
+  #courses = signal<Course[]>([]);
+
+  beginnerCourses = computed(() => {
+    const courses = this.#courses();
+    return courses.filter((course) => course.category === 'BEGINNER');
+  });
+
+  advancedCourses = computed(() => {
+    const courses = this.#courses();
+    return courses.filter((course) => course.category === 'ADVANCED');
+  });
+  coursesService = inject(CoursesServiceWithFetch);
+
+  async loadCourses() {
+    try {
+      const courses = await this.coursesService.loadAllCourses();
+      this.#courses.set(courses.sort(sortCoursesBySeqNo));
+    } catch (err) {
+      alert(`Erros loading courses`);
+      console.error(err);
+    }
+  }
+
+  onCourseUpdated(updatedCourse: Course) {
+    const courses = this.#courses();
+    const newCourses = courses.map((course) =>
+      course.id === updatedCourse.id ? updatedCourse : course
+    );
+    this.#courses.set(newCourses);
+  }
+
+  async onCoursDeleted(deletedCourseId: string) {
+    try {
+      await this.coursesService.deleteCourse(deletedCourseId);
+      const courses = this.#courses();
+      const newCourses = courses.filter(
+        (course) => course.id !== deletedCourseId
+      );
+      this.#courses.set(newCourses);
+    } catch (error) {
+      console.error(error);
+      alert('Error on deleting course.');
+    }
   }
 }
