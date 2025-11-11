@@ -44,11 +44,13 @@ export class EditCourseDialogComponent {
       title: this.data.course?.title,
       longDescription: this.data.course?.longDescription,
       category: this.data.course?.category,
+      // ? this.data.course?.category
+      // : 'BEGINNER',
       iconUrl: this.data.course?.iconUrl,
     });
   }
 
-  onClose() {
+  async onClose() {
     this.dialogRef.close();
   }
 
@@ -56,6 +58,18 @@ export class EditCourseDialogComponent {
     const courseProps = this.form.value as Partial<Course>;
     if (this.data?.mode === 'update') {
       await this.saveCourse(this.data?.course!.id, courseProps);
+    } else if (this.data?.mode === 'create') {
+      await this.createCourse(courseProps);
+    }
+  }
+
+  async createCourse(course: Partial<Course>) {
+    try {
+      const newCourse = this.coursesService.createCourse(course);
+      this.dialogRef.close(newCourse);
+    } catch (error) {
+      console.error(error);
+      alert('Error on create.');
     }
   }
 

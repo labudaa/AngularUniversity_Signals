@@ -22,6 +22,8 @@ import {
   outputFromObservable,
 } from '@angular/core/rxjs-interop';
 import { CoursesServiceWithFetch } from '../services/courses-fetch.service';
+import { openEditCourseDialog } from '../edit-course-dialog/edit-course-dialog.component';
+import { LoadingService } from '../loading/loading.service';
 
 type CounterObject = {
   value: number;
@@ -38,6 +40,8 @@ export class HomeComponent {
   //Other way is to use injector. Example with afterNextRender
   injector = inject(Injector);
   effectRef: EffectRef | null = null;
+  dialog = inject(MatDialog);
+  loadingService = inject(LoadingService);
 
   constructor() {
     //#region EFFECTS
@@ -141,7 +145,7 @@ export class HomeComponent {
     const courses = this.#courses();
     return courses.filter((course) => course.category === 'ADVANCED');
   });
-  coursesService = inject(CoursesServiceWithFetch);
+  coursesService = inject(CoursesService);
 
   async loadCourses() {
     try {
@@ -172,6 +176,17 @@ export class HomeComponent {
     } catch (error) {
       console.error(error);
       alert('Error on deleting course.');
+    }
+  }
+
+  async onAddCourse() {
+    const newCourse = await openEditCourseDialog(this.dialog, {
+      mode: 'create',
+      title: 'Create New Course',
+    });
+    if (newCourse) {
+      const newCourses = [...this.#courses(), newCourse];
+      this.#courses.set(newCourses);
     }
   }
 }
